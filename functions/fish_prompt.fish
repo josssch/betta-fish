@@ -55,7 +55,11 @@ function _git_head_repr
 end
 
 function _is_git_clean
-    command git diff --quiet
+    # first trying the fastest way of checking, which excludes untracked files
+    # otherwise we are checking for all files, using read as a quick-exit
+    command git diff --quiet \
+        && git diff --quiet --staged \
+        && ! command git status --porcelain | read -n 1 >/dev/null 2>&1
 end
 
 function _git_head_tag
