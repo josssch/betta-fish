@@ -2,7 +2,10 @@
 
 set -g DEFAULT_PROMPT_SYMBOL '%'
 set -g SUDO_PROMPT_SYMBOL '#'
-set -g GIT_DIRTY_SYMBOL '✖︎ '
+
+set -g GIT_REBASE_SYMBOL '↯'
+set -g GIT_MERGE_SYMBOL '↯'
+set -g GIT_DIRTY_SYMBOL '±'
 
 # Colors defined here
 
@@ -16,7 +19,7 @@ set yellow (set_color yellow)
 
 # Git related functionality
 
-function _git_display
+function _git_display -a git_root
     set -l git_head (_git_head_repr)
     set -l git_head_tag (_git_head_tag)
 
@@ -26,10 +29,16 @@ function _git_display
         set git_info "$git_info$black $git_head_tag"
     end
 
-    if ! _is_git_clean
-        set -l dirty "$yellow$GIT_DIRTY_SYMBOL"
-        set git_info "$dirty$git_info"
+    set -l symbol
+    if _is_git_rebasing "$git_root"
+        set symbol "$yellow$GIT_REBASE_SYMBOL"
+    else if _is_git_merging "$git_root"
+        set symbol "$yellow$GIT_MERGE_SYMBOL "
+    else if ! _is_git_clean
+        set symbol "$yellow$GIT_DIRTY_SYMBOL "
     end
+
+    set git_info "$symbol$git_info"
 
     echo -n "$white at $git_info"
 end
@@ -54,6 +63,15 @@ function _git_head_repr
     command git symbolic-ref --quiet --short HEAD || command git rev-parse --short HEAD
 end
 
+function _is_git_rebasing -a git_root
+    test -d "$git_root/.git/rebase-merge" \
+        -o -d "$git_root/.git/rebase-apply"
+end
+
+function _is_git_merging -a git_root
+    test -f "$git_root/.git/MERGE_HEAD"
+end
+
 function _is_git_clean
     # first trying the fastest way of checking, which excludes untracked files
     # otherwise we are checking for all files, using read as a quick-exit
@@ -73,8 +91,8 @@ function fish_prompt
 
     # apply git functionality
     set -l git_root (_git_root_dir)
-    if [ "$git_root" ]
-        set -f git_display (_git_display)
+    if [ -n "$git_root" ]
+        set -f git_display (_git_display "$git_root")
         set cwd $cyan(_git_relative_path "$git_root")
     end
 
