@@ -89,16 +89,16 @@ end
 
 function fish_prompt
     set -l cwd $cyan(path basename (prompt_pwd))
+    set -l output "$cwd"
 
     # apply git functionality
     set -l git_root (_git_root_dir)
     if [ -n "$git_root" ]
-        set -f git_display (_git_display "$git_root")
-        set cwd $cyan(_git_relative_path "$git_root")
-    end
+        set -l git_display (_git_display "$git_root")
+        set -l git_cwd $cyan(_git_relative_path "$git_root")
 
-    set -l output "$cwd"
-    set -a output "$git_display"
+        set output "$git_cwd $git_display"
+    end
 
     # apply multi-line prompt only if there isn't that much space
     set -l prompt_length (string length -V "$output")
