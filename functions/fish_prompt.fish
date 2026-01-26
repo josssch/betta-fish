@@ -109,10 +109,10 @@ function fish_prompt
         echo -n "  $output "
     end
 
-    set -l prompt_symbol "$DEFAULT_PROMPT_SYMBOL"
+    set -l prompt_symbol "$black$DEFAULT_PROMPT_SYMBOL"
     if [ $EUID -eq 0 ]
-        set prompt_symbol "$SUDO_PROMPT_SYMBOL"
+        set prompt_symbol "$white$SUDO_PROMPT_SYMBOL"
     end
 
-    echo -n -s "$white$prompt_symbol$normal "
+    echo -n -s "$prompt_symbol$normal "
 end
