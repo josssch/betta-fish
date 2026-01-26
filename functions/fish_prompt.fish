@@ -1,6 +1,7 @@
 # Display options here
 
-set -g DEFAULT_PROMPT_SYMBOL '%'
+set -g OVERFLOW_PROMPT_SYMBOL '⋮'
+set -g DEFAULT_PROMPT_SYMBOL '→'
 set -g SUDO_PROMPT_SYMBOL '#'
 
 set -g GIT_REBASE_SYMBOL '↯'
@@ -40,7 +41,7 @@ function _git_display -a git_root
 
     set git_info "$symbol$git_info"
 
-    echo -n "$white at $git_info"
+    echo -s -n $white "at $git_info"
 end
 
 function _git_relative_path -a git_root
@@ -103,9 +104,9 @@ function fish_prompt
     set -l prompt_length (string length -V "$output")
     set -l remaining_space (math $COLUMNS - $prompt_length)
     if [ $remaining_space -le 50 ]
-        echo -s '| ' $output
+        echo "$OVERFLOW_PROMPT_SYMBOL $output"
     else
-        echo -s -n '  ' $output ' '
+        echo -n "  $output "
     end
 
     set -l prompt_symbol "$DEFAULT_PROMPT_SYMBOL"
