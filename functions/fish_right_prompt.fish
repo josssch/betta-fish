@@ -1,5 +1,10 @@
 set -g FAILURE_SYMBOL '✖︎'
 
+if test "$TERMINAL_EMULATOR" = "JetBrains-JediTerm"
+    # this prevents an extremely weird wrapping bug in JetBrains IDEs
+    set -g FAILURE_SYMBOL 'x'
+end
+
 function _get_status_message -a code
     switch $code
     case 126
